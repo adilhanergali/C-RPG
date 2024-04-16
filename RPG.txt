@@ -1,0 +1,771 @@
+#include <iostream>
+using namespace std;
+char seachest='T';
+bool ender=true, washeroindungeon=false;
+int medicy=9,medicx=5,medicmax,medicmana=30;
+int place=0, medic0=0;
+int zelHP = 2, zelPOW1 = 1, zelPOW2 = 1, pod = 1; 
+char dir='w';
+char ocean='~';
+int foestunned=0, herostunned=0;
+float foedefencepoints=1, herodefencepoints=1, moneymult=1 ;
+int answer, okruglitel;
+int foehealth=6, foemaxhealth=6, foeattacktype, foeattackpower=2, foenormalhealth=5, foenattackpower=1;
+int orklevel=1;
+int herolevel=1;
+int heroexp=0, heroexpneed=20;
+int foeh=5;
+int herohealth=10, heromaxhealth=10, heroattackpower=5;
+float heroattackpowersword=1,herodefencepointsarmor=1,heroattackpowertemp=0, herodefencetemp=1;
+int money=0, backpack=6, bag=4;
+int n=10;
+char field[10][10];
+int herox=4;
+int heroy=4;
+int items[20] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0};
+int prices[20] = {5, 7, 5*orklevel, 10, 15, 30, 35, 20, 90, 45, 100, 5, 6, 11, 20,9999, 15, 25, 30, 30};
+int hint = 0, lostmonans;
+string hintscript[3];
+void herolevelup(){
+  heromaxhealth=heromaxhealth*1.1+1;
+  heroattackpower=heroattackpower*1.5;
+  heroexp=0;
+  heroexpneed=heroexpneed*1.7;
+}
+void potionsbag(){
+  cout<<"[0] Пластырь (У вас есть "<<items[12]<<")"<<endl;
+  cout<<"[1] Аптечка (У вас есть "<<items[13]<<")"<<endl;
+  cout<<"[2] Загадочный суп (У вас есть "<<items[14]<<")"<<endl;
+  cout<<"[3] Подорожник (У вас есть "<<items[15]<<")"<<endl;
+  cout<<"[4] Слабое зелье силы (У вас есть "<<items[16]<<")"<<endl;
+  cout<<"[5] Сильное зелье силы (У вас есть "<<items[17]<<")"<<endl;
+  cout<<"[6] Зелье здоровья (У вас есть "<<items[18]<<")"<<endl;
+  cout<<"[7] Кристаллы народной медицины (У вас есть "<<items[19]<<")"<<endl;
+  cin>>answer;
+  if(items[answer+12]>0){
+    items[answer+12]--;
+    switch(answer){
+  case(0):
+    herohealth += 6;
+    if(herohealth > heromaxhealth){
+      herohealth = heromaxhealth;
+    }
+    cout<<"Пластырь использован!"<<endl;
+  break;
+  case(1):
+    herohealth += 12;
+    if(herohealth > heromaxhealth){
+      herohealth = heromaxhealth;
+    }
+    cout<<"Аптечка использована!"<<endl;
+  break;
+  case(2):
+    heroattackpowertemp++;
+    herohealth += 10;
+    if(herohealth > heromaxhealth){
+      herohealth = heromaxhealth;
+    }
+    cout<<"Загадочный суп использован!"<<endl;
+  break;
+  case(3):
+    herodefencetemp=0;
+    cout<<"Подорожник использован!"<<endl;
+  break;
+  case(4):
+    heroattackpower++;
+    cout<<"Слабое зелье силы использовано!"<<endl;
+  break;
+  case(5):
+    heroattackpower += 2;
+    cout<<"Сильное зелье силы использовано!"<<endl;
+  break;
+  case(6):
+    heromaxhealth += 10;
+    cout<<"Зелье здоровья использовано!"<<endl;
+  break;
+  case(7):
+    cout<<"Кристаллы народной медицины использованы!"<<endl;
+    foestunned--;
+    if(medic0==1){
+      medicmana=medicmana-8;
+    }
+  break;
+    }
+    foestunned++;
+  }}
+void kupec(){
+  cout<<"Купец: Добро пожаловать в магазин! Здесь вы сможете купить магические и не очень вещи."<<endl;
+  cout<<"Вот список вещей находящихся у нас:"<<endl;
+  cout<<"[0] Зелье вреда (наносит 8 урона) 5 монет"<<endl;
+  cout<<"[1] Зелье здоровья (восстанавливает 2/5 здоровья) 7 монет"<<endl;
+  cout<<"[2] Зелье равного противника (Ваши характеристики будут равны характеристикам врага на 1 бой) "<<orklevel*5<<" монет"<<endl;
+  cout<<"[3] 50 на 50 кубики (Наносит урон вам и противнику равного половине здоровья каждого) 10 монет"<<endl;
+  cout<<"[4] Магический снежок (Замораживает врага на 1 ход) 15 монет"<<endl;
+  cout<<"[5] Алюминиевая (Медная) (Стальная) броня 30 монет"<<endl;
+  cout<<"[6] Алюминиевый (Медный) (Стальной) меч 35 монет"<<endl;
+  cout<<"[7] Ставка на деньги 20 монет"<<endl;
+  cout<<"[8] Большой рюкзак 90 монет"<<endl;
+  ;
+  cout<<"[9] Шар предсказаний (Говорит какую следующую атаку использует противник) 45 монет"<<endl;
+  cout<<"[10] Ключ (?) 100 монет"<<endl;
+  cout<<"[11] Подсказка 5 монет"<<endl;
+  cout<<"//Заметка: ваш баланс составляет "<< money <<" монет. "<<endl<<"Чтобы выйти напишите 20." << endl;
+}
+void medik(){
+  if(washeroindungeon == 0){
+    cout<<"Медик: Ну здравствуй. Здесь ты можешь взять лечебные и ... ладно я просто дам тебе листок там все расписано."<<endl;
+    cout<<"Лист доступных товаров:"<<endl;
+  cout<<"[12] Пластырь (восстанавливает 6 ед. здоровья за бой) 6 монет"<<endl;
+  cout<<"[13] Аптечка (восстанавливает 12 ед. здоровья за бой) 11 монет"<<endl;
+  cout<<"[14] Загадочный суп (даёт +1 к урону и +6 к здоровью на 1 бой) 20 монет"<<endl;
+  cout<<"[15] Подорожник (Даёт неуязвимость на 1 бой) 9999 монет | В наличии "<<pod<<" шт."<<endl;
+  cout<<"[16] Слабое зелье силы (даёт +1 к урону) 15 монет | В наличии "<<zelPOW1<<" шт."<<endl;
+  cout<<"[17] Сильное зелье силы (даёт +2 к урону) 25 монет | В наличии "<<zelPOW2<<" шт."<<endl;
+  cout<<"[18] Зелье здоровья (даёт +10 к макс. здоровью) 30 монет | В наличии "<<zelHP<<" шт."<<endl;
+  cout<<"[19] Кристаллы народной медицины (бесполезны) 30 монет"<<endl;
+  cout<<"//Заметка: ваш баланс составляет "<< money <<" монет. "<<endl<<"Чтобы выйти напишите 20." << endl;
+    }
+  else{
+    cout<<"Медик: Фух, ну, битвы битвами, а делать деньги то надо."<<endl;
+  cout<<"Лист доступных товаров:"<<endl;
+  cout<<"[12] Пластырь (восстанавливает 6 ед. здоровья за бой) 6 монет"<<endl;
+  cout<<"[13] Аптечка (восстанавливает 12 ед. здоровья за бой) 11 монет"<<endl;
+  cout<<"[14] Загадочный суп (даёт +1 к урону и +6 к здоровью на 1 бой) 20 монет"<<endl;
+  cout<<"[16] Слабое зелье силы (даёт +1 к урону) 15 монет | В наличии "<<zelPOW1<<" шт."<<endl;
+  cout<<"[18] Зелье здоровья (даёт +10 к макс. здоровью) 30 монет | В наличии "<<zelHP<<" шт."<<endl;
+  cout<<"//Заметка: ваш баланс составляет "<< money <<" монет. "<<endl<<"Чтобы выйти напишите 20." << endl;}
+}
+void orklevelup(){
+  foemaxhealth=foenormalhealth*(1.2+orklevel-1);
+  foeattackpower=foenattackpower+orklevel;
+}
+void mageturn(){
+  
+  if(foeattackpower*herodefencepoints*herodefencepointsarmor*herodefencetemp*2>foeattackpower&&medicmana>4){
+    okruglitel=foeattackpower*herodefencepoints*herodefencepointsarmor*herodefencetemp*2;
+    cout<<"Маг использует разряд молнии и наносит "<<okruglitel<<" урона."<<endl;
+    herohealth=herohealth-okruglitel;
+    medicmana=medicmana-5;
+  }
+  if(foeattackpower*herodefencepoints*herodefencepointsarmor*herodefencetemp*2<=foeattackpower&&medicmana>4){
+    cout<<"Маг использует огненный шар и наносит "<<foeattackpower<<" урона."<<endl;
+    herohealth=herohealth-foeattackpower;
+    medicmana=medicmana-5;
+  }
+  else if(medicmana<5){
+    cout<<"Маг отдыхает и восстанавливает 7 маны."<<endl;
+    medicmana=medicmana+7;
+  }
+  if(foehealth<medicmax/2&&medicmana>4){
+    okruglitel=medicmax*2/5;
+    cout<<"Маг лечится и лечит "<<okruglitel<<" здоровья."<<endl;
+    foehealth=foehealth+okruglitel;
+    medicmana=medicmana-5;
+  }
+
+}
+void orkturn(){
+  if(foeattacktype==0){
+    okruglitel=foeattackpower*herodefencepoints*herodefencepointsarmor*herodefencetemp;
+    cout<<"Огр атакует обычной атакой и наносит "<<okruglitel<<" урона";
+    cout<<endl;
+    herohealth=herohealth-okruglitel;
+  }
+  if(foeattacktype==1){
+    answer=rand()%2;
+    if(answer==1){
+    cout<<"Орк промахнулся"<<endl;}
+    else{
+    okruglitel=foeattackpower*herodefencepoints*2*herodefencepointsarmor*herodefencetemp;
+    cout<<"Орк атакует сильной атакой и наносит "<<okruglitel<<" урона";
+    cout<<endl;
+    herohealth=herohealth-okruglitel;}
+  }
+  if(foeattacktype==2){
+    okruglitel=foeattackpower*herodefencepoints*herodefencetemp/2;
+    cout<<"Орк атакует оглушающей атакой и наносит " <<okruglitel<<" урона";
+    herohealth=herohealth-okruglitel;
+    answer=rand()%2;
+    if(answer==1){
+      cout<<", но не оглушает"<<endl;
+    }
+    else{
+      cout<<", оглушая вас"<<endl;
+      herostunned=1;
+    }
+  }
+  if(foeattacktype>3){
+    okruglitel=foeattackpower*herodefencepoints;
+    cout<<"Орк атакует обычной атакой и наносит "<<okruglitel<<" урона";
+    cout<<endl;
+    herohealth=herohealth-okruglitel;
+  }
+}
+void heroitem(){
+  cout<<"Какой предмет использовать?";
+  cout<<endl;
+  cout<<"[0] Зелье вреда (У вас есть "<<items[0]<<")"<<endl;
+  cout<<"[1] Зелье здоровья (У вас есть "<<items[1]<<")"<<endl;
+  cout<<"[2] Зелье равного противника(У вас есть "<<items[2]<<")"<<endl;
+  cout<<"[3] 50 на 50 кубики (У вас есть "<<items[3]<<")"<<endl;
+  cout<<"[4] Магический снежок (У вас есть "<<items[4]<<")"<<endl;
+  cin>>answer;
+  if(items[answer]>0 and answer<5){
+    items[answer]--;
+  if(answer==0){
+    foehealth=foehealth-8;
+  }
+  if(answer==1){
+    herohealth=herohealth*1.4;
+    if(heromaxhealth<herohealth){
+      herohealth=heromaxhealth;
+    }
+  }
+  if(answer==2){
+    foehealth=herohealth;
+    foeattackpower=heroattackpower;
+    foestunned++;
+    orklevel=herolevel/1.5;
+  }
+  if(answer==3){
+    herohealth=herohealth/2;
+    foehealth=foehealth/2;
+  }
+  if(answer==4){
+    foestunned=2;
+    foehealth=foehealth-5;
+  }
+    }
+  else{
+    foestunned++;
+  }
+}
+void herodefence(){
+  herodefencepoints=0.3;
+  cout<<"Вы защитились";
+  cout<<endl;
+}
+void heroattack(){
+  herodefencepoints=1;
+  cout<<"[1] Обычная атака  [2] Сильная атака(50% промахнутся)   [3] Нашинковывание(наносит 1/5 от общего здоровья врага)";
+  cout<<endl;
+  cin>>answer;
+  
+  if(answer==1){
+    okruglitel=(heroattackpower+heroattackpowertemp)*heroattackpowersword;
+    cout<<"Герой атакует обычной атакой и наносит "<<okruglitel<<" урона";
+    cout<<endl;
+    foehealth=foehealth-okruglitel;
+  }
+  if(answer==2){
+    foeattacktype=rand()%2;
+    if(foeattacktype==1){
+    cout<<"Герой промахнулся"<<endl;}
+    else{
+    okruglitel=(heroattackpower+heroattackpowertemp)*foedefencepoints*2*heroattackpowersword;
+    cout<<"Герой атакует сильной атакой и наносит "<<okruglitel<<" урона";
+    cout<<endl;
+    foehealth=foehealth-okruglitel;}
+  }
+  if(answer==3){
+    okruglitel=foemaxhealth/4;
+    cout<<"Герой нашинковывает врага и наносит "<<okruglitel<<" урона";
+    cout<<endl;
+    foehealth=foehealth-okruglitel;
+  }
+}
+void heroturn(){
+  cout<<"Ваш ход";
+  cout<<endl;
+  cout<<"[1] Атака  [2] Предмет  [3] Защита [4] Медицинские прибамбасы";
+  cout<<endl;
+  cin>>answer;
+  if(answer==1){
+    heroattack();
+  }
+  else if(answer==3){
+    herodefence();
+  }
+  else if(answer==2){
+    heroitem();
+  }
+  else{
+    potionsbag();
+  }
+}
+void heroprint(){
+  field[heroy][herox]='H';
+}
+void fieldprint(){
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      cout<<field[i][j]<<" ";
+    }
+    cout<<endl;
+  }
+}
+int main() {
+  cout<<"Вы просыпаетесь посреди поля, не помня ни о чём кроме одного - вам нужно победить мага и забрать артефакт из сокровищницы."<<endl;
+  srand(time(0));
+  hintscript[0] = "<<Ты, наверное, видел как у реки на острове есть сундук? У меня есть предмет который может помочь тебе, который сияет яркой белизной...>>";
+  hintscript[1] = "<<Ты же знаешь, что никакая броня не защитит тебя от огня?>>";
+  hintscript[2] = "<<Видишь ту дверь? В ней есть замочная скважина, а ключ к ней может быть ближе, чем ты думаешь.>>";
+  int num;
+  bool lostmon=true;
+  while(ender==true){
+    for(int i=0;i<n;i++){
+      for(int j=0;j<n;j++){
+        field[i][j]='.';
+      }}
+    if(place==0){
+    if(lostmon==true){
+    field[2][7]='o';}
+    for(int i=0;i<n-6;i++){
+      for(int j=0;j<n-6;j++){
+        field[i][j]=ocean;   //река
+      }}
+    field[0][0]=seachest;
+    field[4][0]='$';
+    field[8][9]='A';
+    field[9][4]='M';
+    field[0][9]='D';}
+    else if(place==1){
+      if(medic0>0){
+        field[medicy][medicx]='M';
+      }
+      field[0][4]='0';
+      for(int i=1;i<n-1;i=i+2){
+        for(int j=0;j<n;j=j+2){
+          field[i][j]='x';
+        }
+      }
+    }
+    
+    heroprint();
+    fieldprint();
+    cin>>dir;
+    switch(dir){
+    case('w'):
+      if(field[heroy-1][herox]!='~'||items[4]>0){
+        heroy--;
+      }
+      break;
+    case('a'):
+      if(field[heroy][herox-1]!='~'||items[4]>0){
+        herox--;
+      }
+      break;
+    case('s'):
+      if(field[heroy+1][herox]!='~'||items[4]>0){
+        heroy++;
+      }
+      break;
+    case('d'):
+      if(field[heroy][herox+1]!='~'||items[4]>0){
+        herox++;
+      }
+      break;
+    case('e'):
+      if(money>-1){
+        cout<<"Ваш баланс равен: "<<money<<endl;
+    }
+    else{cout<<"Ваш долг равен: "<<money*-1<<endl;}
+      cout<<"Ваш уровень равен: "<<herolevel<<"  "<<heroexp<<"/"<<heroexpneed<<" exp"<<endl;
+      while(items[11] > 0){
+        cout << "У вас есть " << items[11] << " подсказок." << endl << "Не хотите ли использовать одну?(YES - 1/NO - 0)" << endl;
+        cin >> hint;
+        if(hint == 0){
+          break;
+        }
+        if(hint == 1){
+          cout << hintscript[rand()%3]<<endl;
+          items[11]--;
+        }
+      }
+      break;
+      }
+    if(field[heroy][herox]=='~'){
+      cout<<"Герой заморозил воду, бросив в нее снежок"<<endl;
+      items[4]--;
+      ocean='#';}
+    cout<<endl;
+    if(field[heroy][herox]==field[8][9]&&place==0){
+      cout<<"Руководитель арены: Что вы хотите?";
+      cout<<endl;
+      cout<<"[1] Сразиться с орком  [2] Изменить уровень орка [3] Выйти с арены";
+      cout<<endl;
+      cin>>answer;
+      if(answer==1){
+        orklevelup();
+        foehealth=foemaxhealth;
+        foeattacktype=rand()%3;
+        while(herohealth>0&&foehealth>0){
+          cout<<"Здоровье:"<<herohealth<<"/"<<heromaxhealth<<endl;
+          cout<<"Здоровье врага:"<<foehealth<<"/"<<foemaxhealth<<endl;
+          if(items[9]>0){
+            cout<<"Шар шепчет: Враг будет атаковать ";
+            if(foeattacktype==0){
+              cout<<"обычной атакой.";
+            }
+            if(foeattacktype==1){
+              cout<<"сильной атакой.";
+            }
+            if(foeattacktype==2){
+              cout<<"оглушающей атакой.";
+            }
+            cout<<endl;
+          }
+          if(herostunned<1){
+            heroturn();
+            }
+          herostunned=0;
+          if(foehealth<1){
+            break;
+          }
+          if(foestunned<1){
+            orkturn();
+            foeattacktype=rand()%3;}
+          else{foestunned--;
+        cout<<"Враг не атакует"<<endl;
+        if(foestunned>2){foestunned--;}
+        }
+        }
+        heroattackpowertemp=0;
+        herodefencetemp=1;
+        herohealth=heromaxhealth;
+        if(herohealth>0){
+          okruglitel=5*orklevel*herohealth/heromaxhealth*moneymult;
+          cout<<"Вы выиграли и получили "<<okruglitel<<" монет";
+        money=money+okruglitel;
+          heroexp=heroexp+orklevel*2;
+          cout<<" и "<<orklevel*2<<" опыта"<<endl;
+          if(heroexp>heroexpneed-1){
+            cout<<"Ваш уровень повышен!"<<herolevel<<"->"<<herolevel+1<<endl;
+            herolevelup();
+          }
+          }
+          else{
+          okruglitel=orklevel*2*moneymult;
+          cout<<"Вы проиграли и потеряли "<<okruglitel<<" монет"<<endl;
+          money=money-okruglitel;
+          }
+      }
+      else if(answer==2){
+        cout<<"Ладно, на какой уровень?"<<endl;
+        cin>>orklevel;
+        while(orklevel<1){
+          cout<<"Не не не, даже не вздумай ломать игру"<<endl;          
+          cin>>orklevel;
+        }
+        cout<<"Сделано! Уровень орка равен "<<orklevel<<"."<<endl;
+      }
+      else{
+        herox=8;
+        heroy=8;
+        continue;
+      }
+      herox=8;
+      heroy=8;
+      }
+    if(field[heroy][herox]==field[4][0]&&place==0){
+      kupec();
+    }
+    while(field[heroy][herox]==field[4][0]&&place==0){
+        cin >> num;
+        if(num == 20){
+          herox = 1;
+          heroy = 4;
+          break;
+        }
+        if(num > 11){
+          cout<<"Нет такого предмета."<<endl;
+          continue;
+        }
+        if(money >= prices[num]&&backpack>=items[0]+items[1]+items[2]+items[3]+items[4]){
+          items[num]++;
+          if(items[5]>3){
+            items[5] = 3;
+          }
+          if(items[6]>3){
+            items[6] = 3;
+          }
+          if(num>-1&&num<5){
+            money = money - prices[num];
+          }
+          if(num==5&&items[num]==3){
+            cout<<"Купец: Броня максимально прокачана!"<<endl<<"Ваш баланс составляет "<<money<<" монет."<<endl;
+            
+            continue;
+          }
+          if(num==6&&items[num]==3){
+            cout<<"Купец: Меч максимально прокачан!"<<endl<<"Ваш баланс составляет "<<money<<" монет."<<endl;
+            continue;
+          }
+          if(num==5&&items[num]<3){
+            money = money - prices[num];
+          herodefencepointsarmor=herodefencepointsarmor*(1-0.1*items[num]);}
+          if(num==6&&items[6]<3){
+            money = money - prices[num];
+            heroattackpowersword=heroattackpowersword*(1.2+0.1*items[num]);}
+          if(num==7){
+            money = money - prices[num];
+            answer=rand()%5;
+            if(answer>2){
+              money=money+40;
+              cout<<"Купец: Поздравляю ставка сработала."<<endl<<"Ваш баланс составляет "<<money<<" монет."<<endl;
+              continue;
+            }
+            if(answer<3){
+              cout<<"Купец: Простите но ставка не удалась."<<endl<<"Ваш баланс составляет "<<money<<" монет."<<endl;
+              continue;
+            }
+          }
+          if(num==11){
+            money = money - prices[num];
+          }
+          if(num>7&&num<11&&items[num]==1){
+            money = money - prices[num];
+              if(num==8){backpack=12;}
+          }
+          cout << "Купец: Вы купили предмет в магазине!"<<endl<<"Ваш баланс составляет "<<money<<" монет."<<endl;
+          continue;
+        }
+      else if(backpack<items[0]+items[1]+items[2]+items[3]+items[4]){cout<<"Купец: Нет места в рюкзаке"<<endl;}
+      if(money < prices[num]){cout<<"Купец: Недостаточно денег."<<endl;
+        continue; }
+    }
+    if(field[heroy][herox]==field[9][4]&&place==0){
+      medik();
+    }
+    while(field[heroy][herox]==field[9][4]&&place==0){
+        cin >> num;
+        if(num == 20){
+          herox = 4;
+          heroy = 8;
+          break;
+        }
+      if(washeroindungeon == 0){
+        if(num > 19 || num < 12){
+          cout<<"Нет такого предмета."<<endl;
+          continue;
+        }
+        if(money >= prices[num]&&bag>=items[12]+items[13]+items[14]+items[15]+items[16]+items[17]+items[18]){
+          if(num == 15){
+            if(pod == 0){
+              cout << "Медик: Товара нет в наличии!"<<endl;
+              continue;
+            }
+            else
+            pod--;
+          }
+          if(num == 16){
+            if(zelPOW1 == 0){
+              cout << "Медик: Товара нет в наличии!" << endl;
+              continue;
+            }
+            else
+            zelPOW1--;
+          }
+          if(num == 17){
+            if(zelPOW2 == 0){
+              cout << "Медик: Товара нет в наличии!"<<endl;
+              continue;
+            }
+            else
+            zelPOW2--;
+          }
+          if(num == 18){
+            if(zelHP == 0){
+              cout << "Медик: Товара нет в наличии!"<<endl;
+              continue;
+            }
+            else
+            zelHP--;
+          }
+          items[num]++;
+          money = money - prices[num];
+          cout << "Медик: Всё здесь твой предмет."<<endl<<"У тебя осталось "<<money<<" монет."<<endl;
+          continue;
+    }
+        else if(bag<items[12]+items[13]+items[14]+items[15]+items[16]+items[17]+items[18]){
+    cout << "Медик: Всё полон рюкзак, места нет."<<endl;
+    continue;
+      }
+      if(money < prices[num]){cout<<"Медик: За дурака держишь? Нету столько денег у тебя."<<endl;
+        continue;}
+    }
+    else{
+      if(num < 12 || num == 15 || num == 17 || num > 18) {
+        cout<<"Нет такого предмета."<<endl;
+        continue;
+      }
+      if(money >= prices[num]&&bag>=items[12]+items[13]+items[14]+items[15]+items[16]+items[17]+items[18]){
+        if(num == 16){
+            if(zelPOW1 == 0){
+              cout << "Медик: Товара нет в наличии!" << endl;
+              continue;
+            }
+            else
+            zelPOW1--;
+          }
+        if(num == 18){
+            if(zelHP == 0){
+              cout << "Медик: Товара нет в наличии!"<<endl;
+              continue;
+            }
+            else
+            zelHP--;
+          }
+        items[num]++;
+        money = money - prices[num];
+        cout << "Медик: Всё здесь твой предмет."<<endl<<"У тебя осталось "<<money<<" монет."<<endl;
+          continue;
+    }}
+      }
+    if(field[heroy][herox]=='o'){
+      cout<<"На земле лежат потерянные 15 монет. Поднять их или нет?(YES - 1/NO - 0)" << endl;
+      cin>>answer;
+    if(answer == 0){
+      continue;
+    }
+    if(answer == 1){
+      money = money + 15;
+      lostmon = false;
+    }}
+    if(field[heroy][herox]=='T'){
+      cout<<"Вы подобрали корону мертвеца теперь количество денег при выигрыше и проигрыше будет увеличено в 2 раза!" << endl;
+      seachest='.';
+      moneymult=2;
+    }
+    if(field[heroy][herox]=='D'&&items[10]>0){
+      cout<<"Вы открыли дверь с помощью ключа"<<endl;
+      place=1;
+      for(int i=0;i<n;i++){
+      for(int j=0;j<n;j++){
+        field[i][j]='.';
+      }}
+      herox=4;
+      heroy=9;
+    }
+      if(medic0==1&&place==1){
+        for(int fork=0;fork<2;fork++){
+        if(medicx==herox&&medicy>heroy){
+          medicy--;
+        }
+        if(medicx==herox&&medicy<heroy){
+          medicy++;
+        }
+        if(medicx<herox){
+          medicx++;
+        }
+        if(medicx>herox){
+          medicx--;}
+        if(field[medicy][medicx]=='x'){
+          cout<<"Ай чертовы ловушки!"<<endl;
+          foehealth=foehealth-foehealth*1/10;
+        }
+        if(medicx==herox&&medicy==heroy&&medic0>0){
+        cout<<"Ну все время действовать"<<endl;
+        washeroindungeon=true;
+        foeattacktype=rand()%3;
+          herostunned=0;
+          foestunned=0;
+          medicmax=heromaxhealth*1.2;
+        while(herohealth>0&&foehealth>0&&medic0>0){
+          cout<<"Здоровье:"<<herohealth<<"/"<<heromaxhealth<<endl;
+          cout<<"Здоровье врага:"<<foehealth<<"/"<<medicmax<<endl;
+          cout<<"Мана мага:"<<medicmana<<"/30"<<endl;
+          if(items[9]>0){
+            cout<<"Шар молчит"<<endl;}
+          if(herostunned<1){
+            heroturn();
+            }
+          herostunned=0;
+          if(foehealth<1){
+            break;
+          }
+          if(foestunned<1){
+            mageturn();
+            foeattacktype=rand()%3;}
+          else{foestunned--;
+        cout<<"Враг не атакует"<<endl;
+        if(foestunned>2){foestunned--;}
+        }
+        }
+        if(herohealth<=0){
+          cout<<"Вы быстро сбегаете из сокровищницы,  закрыв за собой дверь."<<endl;
+          for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+              field[i][j]='.';
+          }}
+          herohealth=heromaxhealth;
+          medic0=0;
+          place=0;
+          herox=8;
+          heroy=0;
+          break;
+        }
+          cout<<endl;
+        if(foehealth<=0){
+          cout<<"Маг: Аххх! Ладно, ты выиграл."<<endl;
+          cout<<"Маг: Но возможно активировать этот артефакт плохая идея, даже используя меня."<<endl;
+          cout<<"Маг: Я же не совсем плохой человек! Я-я продавал тебе предметы и тебе же в принципе не обязательно активировать артефакт, правда?"<<endl;
+          cout<<"Маг:...Правда?"<<endl;
+          cout<<"[0] Активировать артефакт [1] Пригрозить "<<endl;
+          cin>>answer;
+          if(answer==0){
+            cout<<"Но герой не слушал волшебника и взмахом клинка отрубил ему голову."<<endl;
+            cout<<"Из артефакта начали бить красно-желтые лучи, слепящие глаза."<<endl;
+            cout<<"Герой попытался, прищурив глаза, подойти к артефакту."<<endl;
+            cout<<"Он и не заметил боль, которая пронизывала его, он только думал об артефакте."<<endl;
+            cout<<"И думал он так пока полностью не расплавился..."<<endl;
+            cout<<"Пояснение: Мда, жаль что никто не сказал герою что это не артефакт вовсе а портал в ад. Но в любом случае, надеюсь, что вам понравилась эта игра! (Концовка 1 из 2)"<<endl;
+          }
+          else{
+            cout<<"Маг: Хорошо-хорошо, я всё расскажу только не бей!"<<endl;
+            cout<<"Маг: Чтож видишь ли, этот артефакт если можно его так назвать, это... как так бы выразиться..."<<endl;
+            cout<<"Маг: Портал в ад."<<endl;
+            cout<<"Маг: Да, ты меня правильно понял, он не дарует бессмертие, силу или что ты там у себя понавыдумывал."<<endl;
+            cout<<"Маг: Ок....."<<endl;
+            cout<<"Маг: О, все, у меня достаточно маны, время использовать телепорт! Пока, лузер, мы ещё встретимся!"<<endl;
+            cout<<"Герой быстро подбегает к артефакту и разбивает его вдребезги, при этом он слышит парочку внечеловеческих криков сочащихся из обломков."<<endl;
+            cout<<"Поздравляю вы получили хорошую концовку! Надеюсь, что вам понравилась эта игра! (Концовка 2 из 2)"<<endl;
+          }
+          ender=false;
+        }
+          }
+          }
+    }
+    if(field[heroy][herox]=='0'&&medic0==0){
+      foehealth=herohealth*1.2;
+      foeattackpower=heroattackpower*1.2;
+      medic0=1;
+      medicy=9;
+      medicx=5;
+      field[9][5]='M';
+      cout<<"Медик: Бу!"<<endl;
+      cout<<"Медик: Хехехе. Ладно, ты наверно думаешь что я здесь делаю, да?"<<endl;
+      cout<<"Медик: Чтож, ты наверно знаешь, что ‘медик’ начинается с буквы м, да?"<<endl;
+      cout<<"Медик: А что ещё начинается с буквы м? Маг! Да, я маг, неожиданно, правда?"<<endl;
+      cout<<"Маг: Не думай, что я сюда поболтать пришел, я пришёл чтобы активировать артефакт..."<<endl;
+      cout<<"Маг: Твоим убийством."<<endl;
+      cout<<"Маг: Мда, этот злодейский монолог ужасен, ну да ладно, время активировать артефакт!"<<endl;
+      }
+    if(field[heroy][herox]=='x'){
+      okruglitel=heromaxhealth/10;
+      cout<<"Наступив на ловушку вы теряете "<<okruglitel<<" здоровья.";
+      herohealth=herohealth-okruglitel;
+      cout<<"Осталось "<<herohealth<<endl;
+      if(herohealth<1){cout<<"Вы быстро сбегаете из сокровищницы, закрыв за собой дверь."<<endl;
+        for(int i=0;i<n;i++){
+          for(int j=0;j<n;j++){
+            field[i][j]='.';
+      }}
+        herohealth=heromaxhealth;
+        medic0=0;
+        place=0;
+        herox=8;
+        heroy=0;
+        }
+    }
+    }}
